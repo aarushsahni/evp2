@@ -33,13 +33,13 @@ function App() {
     const assistantId = import.meta.env.VITE_ASSISTANT_ID;
 
     if (assistantId && assistantId !== 'your_assistant_id_here') {
-      setOpenAIService(new OpenAIService('', assistantId));
+      setOpenAIService(new OpenAIService(assistantId));
       setIsConfigured(true);
     } else {
       const storedAssistantId = localStorage.getItem('openai_assistant_id');
 
       if (storedAssistantId) {
-        setOpenAIService(new OpenAIService('', storedAssistantId));
+        setOpenAIService(new OpenAIService(storedAssistantId));
         setIsConfigured(true);
       } else {
         setError(
@@ -53,9 +53,9 @@ function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
-  const handleApiKeySet = (apiKey: string, assistantId: string) => {
+  const handleAssistantConfigured = (assistantId: string) => {
     localStorage.setItem('openai_assistant_id', assistantId);
-    setOpenAIService(new OpenAIService(apiKey, assistantId));
+    setOpenAIService(new OpenAIService(assistantId));
     setIsConfigured(true);
     setError(null);
   };
@@ -132,7 +132,7 @@ function App() {
                 Clear chat
               </button>
               <ApiKeyConfig
-                onApiKeySet={handleApiKeySet}
+                onAssistantConfigured={handleAssistantConfigured}
                 isConfigured={isConfigured}
               />
             </div>
