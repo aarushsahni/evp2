@@ -30,22 +30,20 @@ function App() {
   };
 
   useEffect(() => {
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
     const assistantId = import.meta.env.VITE_ASSISTANT_ID;
 
-    if (apiKey && assistantId && apiKey !== 'your_api_key_here') {
-      setOpenAIService(new OpenAIService(apiKey, assistantId));
+    if (assistantId && assistantId !== 'your_assistant_id_here') {
+      setOpenAIService(new OpenAIService('', assistantId));
       setIsConfigured(true);
     } else {
-      const storedApiKey = localStorage.getItem('openai_api_key');
-      const storedAssistantId = localStorage.getItem('openai_assistant_id') || 'asst_zvFuLn2wRlDVEh5SFO2jYsey';
+      const storedAssistantId = localStorage.getItem('openai_assistant_id');
 
-      if (storedApiKey) {
-        setOpenAIService(new OpenAIService(storedApiKey, storedAssistantId));
+      if (storedAssistantId) {
+        setOpenAIService(new OpenAIService('', storedAssistantId));
         setIsConfigured(true);
       } else {
         setError(
-          'OpenAI API key not configured. Please configure it using the button above.'
+          'Assistant ID not configured. Please configure it using the button above.'
         );
       }
     }
@@ -56,7 +54,6 @@ function App() {
   }, [messages, isLoading]);
 
   const handleApiKeySet = (apiKey: string, assistantId: string) => {
-    localStorage.setItem('openai_api_key', apiKey);
     localStorage.setItem('openai_assistant_id', assistantId);
     setOpenAIService(new OpenAIService(apiKey, assistantId));
     setIsConfigured(true);

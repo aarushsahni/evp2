@@ -1,3 +1,6 @@
+import { VercelRequest, VercelResponse } from '@vercel/node';
+import OpenAI from 'openai';
+
 const SYSTEM_PROMPT = `
 You are a CLINICAL SUPPORT ASSISTANT for urologists managing patients who may receive or have received Enfortumab Vedotin + Pembrolizumab (EVP) for urothelial carcinoma.
 
@@ -56,49 +59,96 @@ interface ThreadState {
 
 const threadStates: ThreadState = {};
 
-export class OpenAIService {
-  private assistantId: string;
-  private sessionId: string;
-
-  constructor(apiKey: string, assistantId: string) {
-    if (!apiKey) throw new Error("Missing OpenAI API key");
-    if (!assistantId) throw new Error("Missing Assistant ID");
-
-    this.assistantId = assistantId;
-    this.sessionId = `session_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+export default async function handler(
+  req: VercelRequest,
+  res: VercelResponse
+) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  resetConversation() {
-    delete threadStates[this.sessionId];
-  }
+  try {
+    const { message, sessionId, assistantId } = req.body;
 
-  async askQuestion(question: string): Promise<string> {
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: question,
-          sessionId: this.sessionId,
-          assistantId: this.assistantId,
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to get response from API");
-      }
-
-      const data = await response.json();
-      return data.response;
-    } catch (error) {
-      console.error("API Error:", error);
-      if (error instanceof Error) {
-        throw new Error(`API Error: ${error.message}`);
-      }
-      throw new Error("An unexpected error occurred while communicating with the API");
+    if (!message || !sessionId || !assistantId) {
+      return res
+        .status(400)
+        .json({ error: 'Missing required fields' });
     }
+
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return res
+        .status(500)
+        .json({ error: 'OpenAI API key not configured' });
+    }
+
+    const client = new OpenAI({ apiKey });
+
+    let threadId = threadStates[sessionId];
+
+    if (!threadId) {
+      const thread = await client.beta.threads.create();
+      threadId = thread.id;
+      threadStates[sessionId] = threadId;
+    }
+
+    await client.beta.threads.messages.create(threadId, {
+      role: 'user',
+      content: [
+        {
+          type: 'text',
+          text: message,
+        },
+      ],
+    });
+
+    const run = await client.beta.threads.runs.create(threadId, {
+      assistant_id: assistantId,
+      instructions: SYSTEM_PROMPT,
+    });
+
+    let runStatus = await client.beta.threads.runs.retrieve(threadId, run.id);
+
+    while (runStatus.status !== 'completed') {
+      if (['failed', 'cancelled', 'expired'].includes(runStatus.status)) {
+        const errorMessage =
+          runStatus.last_error?.message ||
+          `Run ended with status: ${runStatus.status}`;
+        throw new Error(errorMessage);
+      }
+      await new Promise((r) => setTimeout(r, 1000));
+      runStatus = await client.beta.threads.runs.retrieve(threadId, run.id);
+    }
+
+    const messages = await client.beta.threads.messages.list(threadId);
+
+    const assistantMessage = messages.data.find(
+      (m) => m.role === 'assistant' && m.run_id === run.id
+    ) || messages.data.find((m) => m.role === 'assistant');
+
+    if (assistantMessage) {
+      const parts: string[] = [];
+
+      for (const item of assistantMessage.content) {
+        if (item.type === 'text' && item.text?.value) {
+          const value = item.text.value.trim();
+          if (value) {
+            parts.push(value);
+          }
+        }
+      }
+
+      if (parts.length > 0) {
+        return res.status(200).json({ response: parts.join('\n\n') });
+      }
+    }
+
+    throw new Error('Unexpected response format — no text message found');
+  } catch (error) {
+    console.error('API Error:', error);
+    const errorMessage =
+      error instanceof Error ? error.message : 'An unexpected error occurred';
+    return res.status(500).json({ error: errorMessage });
   }
 }
