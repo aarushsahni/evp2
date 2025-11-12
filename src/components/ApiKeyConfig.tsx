@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 
 interface ApiKeyConfigProps {
-  onApiKeySet: (apiKey: string, assistantId: string) => void;
+  onAssistantConfigured: (assistantId: string) => void;
   isConfigured: boolean;
 }
 
-export function ApiKeyConfig({ onApiKeySet, isConfigured }: ApiKeyConfigProps) {
+export function ApiKeyConfig({
+  onAssistantConfigured,
+  isConfigured,
+}: ApiKeyConfigProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [assistantId, setAssistantId] = useState(
     import.meta.env.VITE_ASSISTANT_ID || ''
@@ -15,7 +18,7 @@ export function ApiKeyConfig({ onApiKeySet, isConfigured }: ApiKeyConfigProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (assistantId.trim()) {
-      onApiKeySet('', assistantId);
+      onAssistantConfigured(assistantId);
       setIsOpen(false);
     }
   };
@@ -88,8 +91,8 @@ export function ApiKeyConfig({ onApiKeySet, isConfigured }: ApiKeyConfigProps) {
             <div className="px-6 py-3 bg-blue-50 border-t border-slate-200 flex gap-2 text-xs text-blue-700 rounded-b-lg">
               <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
               <p>
-                API key is securely handled on the server and never exposed to
-                the browser.
+                Assistant ID is stored locally; the server keeps the OpenAI API
+                key secure.
               </p>
             </div>
           </div>
