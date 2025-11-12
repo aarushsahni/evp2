@@ -60,8 +60,7 @@ export class OpenAIService {
   private assistantId: string;
   private sessionId: string;
 
-  constructor(apiKey: string, assistantId: string) {
-    if (!apiKey) throw new Error("Missing OpenAI API key");
+  constructor(assistantId: string) {
     if (!assistantId) throw new Error("Missing Assistant ID");
 
     this.assistantId = assistantId;
