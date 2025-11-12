@@ -108,7 +108,9 @@ export default async function handler(
       instructions: SYSTEM_PROMPT,
     });
 
-    let runStatus = await client.beta.threads.runs.retrieve(threadId, run.id);
+    let runStatus = await client.beta.threads.runs.retrieve(run.id, {
+      thread_id: threadId,
+    });
 
     while (runStatus.status !== 'completed') {
       if (['failed', 'cancelled', 'expired'].includes(runStatus.status)) {
@@ -118,7 +120,9 @@ export default async function handler(
         throw new Error(errorMessage);
       }
       await new Promise((r) => setTimeout(r, 1000));
-      runStatus = await client.beta.threads.runs.retrieve(threadId, run.id);
+      runStatus = await client.beta.threads.runs.retrieve(run.id, {
+        thread_id: threadId,
+      });
     }
 
     const messages = await client.beta.threads.messages.list(threadId);
