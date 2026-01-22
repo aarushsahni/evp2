@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 interface ComorbiditiesProps {
   selected: string[];
@@ -7,38 +7,32 @@ interface ComorbiditiesProps {
 }
 
 const COMMON_COMORBIDITIES = [
-  'Diabetes mellitus',
+  'Diabetes',
   'Hypertension',
-  'Coronary artery disease',
+  'CAD',
   'Heart failure',
-  'Atrial fibrillation',
+  'A-fib',
   'COPD',
   'Asthma',
-  'Chronic kidney disease',
-  'Peripheral neuropathy',
-  'Autoimmune disease',
-  'Hypothyroidism',
-  'Hyperthyroidism',
-  'Hepatitis B',
-  'Hepatitis C',
+  'CKD',
+  'Neuropathy',
+  'Autoimmune',
+  'Hypothyroid',
+  'Hep B/C',
   'HIV',
-  'Prior malignancy',
+  'Prior cancer',
   'Obesity',
-  'Depression',
-  'Dementia',
 ];
 
 export function Comorbidities({ selected, onChange }: ComorbiditiesProps) {
   const [customInput, setCustomInput] = useState('');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const availableOptions = COMMON_COMORBIDITIES.filter(
-    (c) => !selected.includes(c)
-  );
-
-  const handleSelectFromDropdown = (comorbidity: string) => {
-    onChange([...selected, comorbidity]);
-    setIsDropdownOpen(false);
+  const handleToggle = (comorbidity: string) => {
+    if (selected.includes(comorbidity)) {
+      onChange(selected.filter((c) => c !== comorbidity));
+    } else {
+      onChange([...selected, comorbidity]);
+    }
   };
 
   const handleAddCustom = () => {
@@ -49,10 +43,6 @@ export function Comorbidities({ selected, onChange }: ComorbiditiesProps) {
     }
   };
 
-  const handleRemove = (comorbidity: string) => {
-    onChange(selected.filter((c) => c !== comorbidity));
-  };
-
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -60,80 +50,69 @@ export function Comorbidities({ selected, onChange }: ComorbiditiesProps) {
     }
   };
 
+  // Get custom entries (ones not in the preset list)
+  const customEntries = selected.filter(
+    (s) => !COMMON_COMORBIDITIES.includes(s)
+  );
+
   return (
     <div>
       <label className="block text-xs font-medium text-slate-600 mb-2">
         Comorbidities
       </label>
 
-      {/* Selected comorbidities as tags */}
-      {selected.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-3">
-          {selected.map((comorbidity) => (
-            <span
+      {/* Toggle buttons for common comorbidities */}
+      <div className="flex flex-wrap gap-1.5 mb-2">
+        {COMMON_COMORBIDITIES.map((comorbidity) => {
+          const isSelected = selected.includes(comorbidity);
+          return (
+            <button
               key={comorbidity}
-              className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 text-xs rounded-full border border-emerald-200"
+              onClick={() => handleToggle(comorbidity)}
+              className={`px-2 py-1 text-xs rounded-md border transition-colors ${
+                isSelected
+                  ? 'bg-emerald-100 border-emerald-300 text-emerald-700'
+                  : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+              }`}
             >
               {comorbidity}
-              <button
-                onClick={() => handleRemove(comorbidity)}
-                className="hover:text-emerald-900 transition-colors"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Custom entries */}
+      {customEntries.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {customEntries.map((custom) => (
+            <button
+              key={custom}
+              onClick={() => handleToggle(custom)}
+              className="px-2 py-1 text-xs rounded-md border bg-emerald-100 border-emerald-300 text-emerald-700 transition-colors"
+            >
+              {custom} ×
+            </button>
           ))}
         </div>
       )}
 
-      {/* Dropdown and custom input */}
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="w-full px-3 py-2 text-sm text-left border border-slate-200 rounded-md hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white"
-          >
-            <span className="text-slate-500">Select common comorbidity...</span>
-          </button>
-
-          {isDropdownOpen && (
-            <div className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-slate-200 rounded-md shadow-lg">
-              {availableOptions.length > 0 ? (
-                availableOptions.map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => handleSelectFromDropdown(option)}
-                    className="w-full px-3 py-2 text-sm text-left hover:bg-emerald-50 transition-colors"
-                  >
-                    {option}
-                  </button>
-                ))
-              ) : (
-                <div className="px-3 py-2 text-sm text-slate-500">
-                  All common options selected
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="flex gap-1">
-          <input
-            type="text"
-            value={customInput}
-            onChange={(e) => setCustomInput(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="Add custom..."
-            className="w-32 px-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-          />
-          <button
-            onClick={handleAddCustom}
-            disabled={!customInput.trim()}
-            className="px-2 py-2 bg-slate-100 text-slate-600 rounded-md hover:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Plus className="w-4 h-4" />
-          </button>
-        </div>
+      {/* Add custom input */}
+      <div className="flex gap-1">
+        <input
+          type="text"
+          value={customInput}
+          onChange={(e) => setCustomInput(e.target.value)}
+          onKeyDown={handleKeyPress}
+          placeholder="Add other..."
+          className="flex-1 px-2 py-1 text-xs border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-transparent"
+        />
+        <button
+          onClick={handleAddCustom}
+          disabled={!customInput.trim()}
+          className="px-2 py-1 bg-slate-100 text-slate-600 rounded-md hover:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Plus className="w-3 h-3" />
+        </button>
       </div>
     </div>
   );
