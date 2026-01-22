@@ -7,21 +7,52 @@ interface ComorbiditiesProps {
 }
 
 const COMMON_COMORBIDITIES = [
-  'Diabetes',
+  // Cardiovascular
   'Hypertension',
   'CAD',
   'Heart failure',
   'A-fib',
+  'DVT/PE',
+  'PVD',
+  // Metabolic
+  'Diabetes',
+  'Obesity',
+  'Dyslipidemia',
+  // Pulmonary
   'COPD',
   'Asthma',
+  'ILD',
+  // Renal/Hepatic
   'CKD',
+  'Cirrhosis',
+  'Hep B',
+  'Hep C',
+  // Neurologic
   'Neuropathy',
-  'Autoimmune',
+  'Stroke/TIA',
+  'Dementia',
+  // Endocrine
   'Hypothyroid',
-  'Hep B/C',
+  'Hyperthyroid',
+  'Adrenal insufficiency',
+  // Autoimmune/Inflammatory
+  'Rheumatoid arthritis',
+  'Lupus/SLE',
+  'IBD',
+  'Psoriasis',
+  'Other autoimmune',
+  // Infectious
   'HIV',
-  'Prior cancer',
-  'Obesity',
+  'TB history',
+  // Oncologic
+  'Prior malignancy',
+  'Active 2nd cancer',
+  // Psychiatric
+  'Depression',
+  'Anxiety',
+  // Other
+  'Transplant recipient',
+  'Immunosuppressed',
 ];
 
 export function Comorbidities({ selected, onChange }: ComorbiditiesProps) {
