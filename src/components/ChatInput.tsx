@@ -25,7 +25,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
 
   return (
     <div className="border-t border-slate-200 bg-white p-4">
-      <div className="max-w-6xl mx-auto flex gap-3 pl-[22rem]">
+      <div className="max-w-4xl mx-auto flex gap-3">
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
