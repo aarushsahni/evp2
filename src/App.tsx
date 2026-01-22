@@ -148,29 +148,29 @@ function App() {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col min-h-0">
-        <div className="max-w-6xl mx-auto px-6 py-6 flex-1 flex flex-col min-h-0 w-full">
-          <div className="flex gap-6 flex-1 min-h-0">
+      <main className="flex-1">
+        <div className="max-w-6xl mx-auto px-6 py-6 w-full">
+          <div className="flex gap-6 items-stretch">
             {/* Left sidebar - Patient Info */}
-            <div className="w-80 flex-shrink-0 overflow-y-auto">
+            <div className="w-80 flex-shrink-0">
               <PatientInfoForm
                 onGenerateQuestion={handleSendMessage}
                 disabled={isLoading || !openAIService}
               />
             </div>
 
-            {/* Main chat area */}
-            <div className="flex-1 min-w-0 flex flex-col">
-              <div className="flex-1 overflow-y-auto min-h-0">
+            {/* Main chat area - matches height of patient panel */}
+            <div className="flex-1 min-w-0 flex flex-col bg-white border border-slate-200 rounded-lg">
+              <div className="flex-1 overflow-y-auto p-4">
                 {messages.length === 0 && !error && (
-                  <div className="text-center py-8">
-                    <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3">
-                      <Stethoscope className="w-7 h-7 text-emerald-600" />
+                  <div className="text-center py-6">
+                    <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3">
+                      <Stethoscope className="w-6 h-6 text-emerald-600" />
                     </div>
-                    <h2 className="text-lg font-semibold text-slate-800 mb-2">
+                    <h2 className="text-base font-semibold text-slate-800 mb-2">
                       Welcome to EVP Clinical Assistant
                     </h2>
-                    <p className="text-slate-600 text-sm max-w-md mx-auto">
+                    <p className="text-slate-600 text-xs max-w-sm mx-auto">
                       Evidence-based clinical guidance for urologists managing
                       EVP therapy. Ask about dosing, efficacy, safety, or trial data.
                     </p>
@@ -182,11 +182,11 @@ function App() {
                 )}
 
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
                     <div>
-                      <h3 className="font-semibold text-red-800 mb-1">Error</h3>
-                      <p className="text-red-700 text-sm">{error}</p>
+                      <h3 className="font-semibold text-red-800 text-sm mb-1">Error</h3>
+                      <p className="text-red-700 text-xs">{error}</p>
                     </div>
                   </div>
                 )}
@@ -213,8 +213,8 @@ function App() {
                 </div>
               </div>
 
-              {/* Chat input at bottom of chat area */}
-              <div className="pt-4 border-t border-slate-200 mt-4">
+              {/* Chat input at bottom */}
+              <div className="p-4 border-t border-slate-200 mt-auto">
                 <ChatInput
                   onSend={handleSendMessage}
                   disabled={isLoading || !openAIService}
