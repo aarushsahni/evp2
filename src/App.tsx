@@ -148,81 +148,82 @@ function App() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="flex gap-6">
+      <main className="flex-1 flex flex-col min-h-0">
+        <div className="max-w-6xl mx-auto px-6 py-6 flex-1 flex flex-col min-h-0 w-full">
+          <div className="flex gap-6 flex-1 min-h-0">
             {/* Left sidebar - Patient Info */}
-            <div className="w-80 flex-shrink-0">
-              <div className="sticky top-8">
-                <PatientInfoForm
-                  onGenerateQuestion={handleSendMessage}
-                  disabled={isLoading || !openAIService}
-                />
-              </div>
+            <div className="w-80 flex-shrink-0 overflow-y-auto">
+              <PatientInfoForm
+                onGenerateQuestion={handleSendMessage}
+                disabled={isLoading || !openAIService}
+              />
             </div>
 
             {/* Main chat area */}
-            <div className="flex-1 min-w-0">
-              {messages.length === 0 && !error && (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-                    <Stethoscope className="w-8 h-8 text-emerald-600" />
+            <div className="flex-1 min-w-0 flex flex-col">
+              <div className="flex-1 overflow-y-auto min-h-0">
+                {messages.length === 0 && !error && (
+                  <div className="text-center py-8">
+                    <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3">
+                      <Stethoscope className="w-7 h-7 text-emerald-600" />
+                    </div>
+                    <h2 className="text-lg font-semibold text-slate-800 mb-2">
+                      Welcome to EVP Clinical Assistant
+                    </h2>
+                    <p className="text-slate-600 text-sm max-w-md mx-auto">
+                      Evidence-based clinical guidance for urologists managing
+                      EVP therapy. Ask about dosing, efficacy, safety, or trial data.
+                    </p>
+                    <QuickQuestions
+                      onSelect={handleSendMessage}
+                      disabled={isLoading || !openAIService}
+                    />
                   </div>
-                  <h2 className="text-xl font-semibold text-slate-800 mb-2">
-                    Welcome to EVP Clinical Assistant
-                  </h2>
-                  <p className="text-slate-600 max-w-lg mx-auto">
-                    This tool provides evidence-based clinical guidance for
-                    urologists managing patients receiving Enfortumab Vedotin +
-                    Pembrolizumab therapy. Ask questions about dosing, efficacy,
-                    safety, or trial data.
-                  </p>
-                  <QuickQuestions
-                    onSelect={handleSendMessage}
-                    disabled={isLoading || !openAIService}
-                  />
-                </div>
-              )}
+                )}
 
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="font-semibold text-red-800 mb-1">Error</h3>
-                    <p className="text-red-700 text-sm">{error}</p>
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-semibold text-red-800 mb-1">Error</h3>
+                      <p className="text-red-700 text-sm">{error}</p>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              <div className="space-y-6">
-                {messages.map((message, index) => (
-                  <div key={message.id}>
-                    <ChatMessage message={message} />
-                    {/* Show follow-up questions after the last assistant message */}
-                    {message.role === 'assistant' &&
-                      index === messages.length - 1 &&
-                      !isLoading &&
-                      followUpQuestions.length > 0 && (
-                        <FollowUpQuestions
-                          questions={followUpQuestions}
-                          onSelect={handleSendMessage}
-                          disabled={isLoading || !openAIService}
-                        />
-                      )}
-                  </div>
-                ))}
-                {isLoading && <LoadingIndicator />}
-                <div ref={messagesEndRef} />
+                <div className="space-y-4">
+                  {messages.map((message, index) => (
+                    <div key={message.id}>
+                      <ChatMessage message={message} />
+                      {/* Show follow-up questions after the last assistant message */}
+                      {message.role === 'assistant' &&
+                        index === messages.length - 1 &&
+                        !isLoading &&
+                        followUpQuestions.length > 0 && (
+                          <FollowUpQuestions
+                            questions={followUpQuestions}
+                            onSelect={handleSendMessage}
+                            disabled={isLoading || !openAIService}
+                          />
+                        )}
+                    </div>
+                  ))}
+                  {isLoading && <LoadingIndicator />}
+                  <div ref={messagesEndRef} />
+                </div>
+              </div>
+
+              {/* Chat input at bottom of chat area */}
+              <div className="pt-4 border-t border-slate-200 mt-4">
+                <ChatInput
+                  onSend={handleSendMessage}
+                  disabled={isLoading || !openAIService}
+                />
               </div>
             </div>
           </div>
         </div>
       </main>
-
-      <ChatInput
-        onSend={handleSendMessage}
-        disabled={isLoading || !openAIService}
-      />
     </div>
   );
 }

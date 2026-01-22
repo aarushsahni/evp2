@@ -24,26 +24,24 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   };
 
   return (
-    <div className="border-t border-slate-200 bg-white p-4">
-      <div className="max-w-6xl mx-auto flex gap-3 pl-[22rem]">
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyPress}
-          placeholder="Ask a clinical question about EVP therapy..."
-          disabled={disabled}
-          className="flex-1 resize-none rounded-lg border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent disabled:bg-slate-50 disabled:text-slate-400"
-          rows={3}
-        />
-        <button
-          onClick={handleSend}
-          disabled={!input.trim() || disabled}
-          className="px-6 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed flex items-center gap-2"
-        >
-          <Send className="w-5 h-5" />
-          Send
-        </button>
-      </div>
+    <div className="flex gap-3">
+      <textarea
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyPress}
+        placeholder="Ask a clinical question about EVP therapy..."
+        disabled={disabled}
+        className="flex-1 resize-none rounded-lg border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent disabled:bg-slate-50 disabled:text-slate-400 text-sm"
+        rows={2}
+      />
+      <button
+        onClick={handleSend}
+        disabled={!input.trim() || disabled}
+        className="px-5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
+      >
+        <Send className="w-4 h-4" />
+        Send
+      </button>
     </div>
   );
 }
