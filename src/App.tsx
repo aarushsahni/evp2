@@ -108,7 +108,7 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <header className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-screen-xl mx-auto px-8 py-5">
+        <div className="max-w-[1600px] mx-auto px-10 py-4">
           <div className="flex items-center gap-3 justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center">
@@ -149,10 +149,10 @@ function App() {
       </header>
 
       <main className="flex-1">
-        <div className="max-w-screen-xl mx-auto px-8 py-6 w-full">
+        <div className="max-w-[1600px] mx-auto px-10 py-4 w-full">
           <div className="flex gap-8 items-stretch">
             {/* Left sidebar - Patient Info */}
-            <div className="w-96 flex-shrink-0">
+            <div className="w-[420px] flex-shrink-0">
               <PatientInfoForm
                 onGenerateQuestion={handleSendMessage}
                 disabled={isLoading || !openAIService}
@@ -163,14 +163,14 @@ function App() {
             <div className="flex-1 min-w-0 flex flex-col bg-white border border-slate-200 rounded-lg">
               <div className="flex-1 overflow-y-auto p-4">
                 {messages.length === 0 && !error && (
-                  <div className="text-center py-6">
-                    <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3">
-                      <Stethoscope className="w-6 h-6 text-emerald-600" />
+                  <div className="text-center py-8">
+                    <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+                      <Stethoscope className="w-7 h-7 text-emerald-600" />
                     </div>
-                    <h2 className="text-base font-semibold text-slate-800 mb-2">
+                    <h2 className="text-xl font-semibold text-slate-800 mb-2">
                       Welcome to EVP Clinical Assistant
                     </h2>
-                    <p className="text-slate-600 text-xs max-w-sm mx-auto">
+                    <p className="text-slate-600 text-sm max-w-md mx-auto">
                       Evidence-based clinical guidance for urologists managing
                       EVP therapy. Ask about dosing, efficacy, safety, or trial data.
                     </p>

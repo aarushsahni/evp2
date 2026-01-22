@@ -16,7 +16,7 @@ export function QuickQuestions({ onSelect, disabled }: QuickQuestionsProps) {
     <div className="mt-6">
       <div className="flex items-center gap-2 justify-center mb-3">
         <MessageCircleQuestion className="w-4 h-4 text-slate-500" />
-        <span className="text-xs font-medium text-slate-600">Quick Questions</span>
+        <span className="text-sm font-medium text-slate-600">Quick Questions</span>
       </div>
       <div className="flex flex-col gap-2 max-w-lg mx-auto">
         {QUICK_QUESTIONS.map((question, index) => (
@@ -24,7 +24,7 @@ export function QuickQuestions({ onSelect, disabled }: QuickQuestionsProps) {
             key={index}
             onClick={() => onSelect(question)}
             disabled={disabled}
-            className="text-left px-3 py-2 bg-white border border-slate-200 rounded-lg hover:border-emerald-300 hover:bg-emerald-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs text-slate-700"
+            className="text-left px-4 py-2.5 bg-white border border-slate-200 rounded-lg hover:border-emerald-300 hover:bg-emerald-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm text-slate-700"
           >
             {question}
           </button>
