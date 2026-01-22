@@ -5,13 +5,10 @@ import { ChatMessage } from './components/ChatMessage';
 import { ChatInput } from './components/ChatInput';
 import { LoadingIndicator } from './components/LoadingIndicator';
 import { ApiKeyConfig } from './components/ApiKeyConfig';
-// import { QuickQuestions } from './components/QuickQuestions';
-// import { FollowUpQuestions } from './components/FollowUpQuestions';
-// import { PatientInfoForm } from './components/PatientInfoForm';
+import { QuickQuestions } from './components/QuickQuestions';
+import { FollowUpQuestions } from './components/FollowUpQuestions';
+import { PatientInfoForm } from './components/PatientInfoForm';
 import { AlertCircle, Stethoscope } from 'lucide-react';
-
-// TEST MARKER - DELETE THIS AFTER CONFIRMING DEPLOYMENT WORKS
-const DEPLOY_TEST = "DEPLOYMENT TEST v1 - Jan 22 2026";
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -21,10 +18,12 @@ function App() {
     null
   );
   const [isConfigured, setIsConfigured] = useState(false);
+  const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handleClearChat = () => {
     setMessages([]);
+    setFollowUpQuestions([]);
   };
 
   const handleNewConversation = () => {
@@ -32,6 +31,7 @@ function App() {
       openAIService.resetConversation();
     }
     setMessages([]);
+    setFollowUpQuestions([]);
     setError(null);
   };
 
@@ -82,9 +82,10 @@ function App() {
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
     setError(null);
+    setFollowUpQuestions([]);
 
     try {
-      const { response } = await openAIService.askQuestion(content);
+      const { response, followUpQuestions: newFollowUps } = await openAIService.askQuestion(content);
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -94,6 +95,7 @@ function App() {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+      setFollowUpQuestions(newFollowUps);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'An unexpected error occurred'
@@ -147,46 +149,72 @@ function App() {
       </header>
 
       <main className="flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          {/* TEST BANNER - DELETE AFTER CONFIRMING */}
-          <div className="bg-yellow-100 border-2 border-yellow-400 rounded-lg p-4 mb-6 text-center">
-            <p className="text-yellow-800 font-bold text-lg">{DEPLOY_TEST}</p>
-            <p className="text-yellow-700 text-sm">If you see this, deployment is working!</p>
-          </div>
-
-          {messages.length === 0 && !error && (
-            <div className="text-center py-16">
-              <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-                <Stethoscope className="w-8 h-8 text-emerald-600" />
-              </div>
-              <h2 className="text-xl font-semibold text-slate-800 mb-2">
-                Welcome to EVP Clinical Assistant
-              </h2>
-              <p className="text-slate-600 max-w-lg mx-auto">
-                This tool provides evidence-based clinical guidance for
-                urologists managing patients receiving Enfortumab Vedotin +
-                Pembrolizumab therapy. Ask questions about dosing, efficacy,
-                safety, or trial data.
-              </p>
-            </div>
-          )}
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-semibold text-red-800 mb-1">Error</h3>
-                <p className="text-red-700 text-sm">{error}</p>
+        <div className="max-w-6xl mx-auto px-6 py-8">
+          <div className="flex gap-6">
+            {/* Left sidebar - Patient Info */}
+            <div className="w-80 flex-shrink-0">
+              <div className="sticky top-8">
+                <PatientInfoForm
+                  onGenerateQuestion={handleSendMessage}
+                  disabled={isLoading || !openAIService}
+                />
               </div>
             </div>
-          )}
 
-          <div className="space-y-6">
-            {messages.map((message) => (
-              <ChatMessage key={message.id} message={message} />
-            ))}
-            {isLoading && <LoadingIndicator />}
-            <div ref={messagesEndRef} />
+            {/* Main chat area */}
+            <div className="flex-1 min-w-0">
+              {messages.length === 0 && !error && (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+                    <Stethoscope className="w-8 h-8 text-emerald-600" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-slate-800 mb-2">
+                    Welcome to EVP Clinical Assistant
+                  </h2>
+                  <p className="text-slate-600 max-w-lg mx-auto">
+                    This tool provides evidence-based clinical guidance for
+                    urologists managing patients receiving Enfortumab Vedotin +
+                    Pembrolizumab therapy. Ask questions about dosing, efficacy,
+                    safety, or trial data.
+                  </p>
+                  <QuickQuestions
+                    onSelect={handleSendMessage}
+                    disabled={isLoading || !openAIService}
+                  />
+                </div>
+              )}
+
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="font-semibold text-red-800 mb-1">Error</h3>
+                    <p className="text-red-700 text-sm">{error}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-6">
+                {messages.map((message, index) => (
+                  <div key={message.id}>
+                    <ChatMessage message={message} />
+                    {/* Show follow-up questions after the last assistant message */}
+                    {message.role === 'assistant' &&
+                      index === messages.length - 1 &&
+                      !isLoading &&
+                      followUpQuestions.length > 0 && (
+                        <FollowUpQuestions
+                          questions={followUpQuestions}
+                          onSelect={handleSendMessage}
+                          disabled={isLoading || !openAIService}
+                        />
+                      )}
+                  </div>
+                ))}
+                {isLoading && <LoadingIndicator />}
+                <div ref={messagesEndRef} />
+              </div>
+            </div>
           </div>
         </div>
       </main>
