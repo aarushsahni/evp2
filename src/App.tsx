@@ -108,7 +108,7 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <header className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-6xl mx-auto px-6 py-5">
+        <div className="max-w-screen-xl mx-auto px-8 py-5">
           <div className="flex items-center gap-3 justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-emerald-600 flex items-center justify-center">
@@ -149,10 +149,10 @@ function App() {
       </header>
 
       <main className="flex-1">
-        <div className="max-w-6xl mx-auto px-6 py-6 w-full">
-          <div className="flex gap-6 items-stretch">
+        <div className="max-w-screen-xl mx-auto px-8 py-6 w-full">
+          <div className="flex gap-8 items-stretch">
             {/* Left sidebar - Patient Info */}
-            <div className="w-80 flex-shrink-0">
+            <div className="w-96 flex-shrink-0">
               <PatientInfoForm
                 onGenerateQuestion={handleSendMessage}
                 disabled={isLoading || !openAIService}
