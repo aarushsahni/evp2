@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, ChevronDown } from 'lucide-react';
 
 interface ComorbiditiesProps {
   selected: string[];
@@ -7,56 +7,48 @@ interface ComorbiditiesProps {
 }
 
 const COMMON_COMORBIDITIES = [
-  // Cardiovascular
+  'Diabetes',
   'Hypertension',
   'CAD',
   'Heart failure',
   'A-fib',
-  'DVT/PE',
-  'PVD',
-  // Metabolic
-  'Diabetes',
-  'Obesity',
-  'Dyslipidemia',
-  // Pulmonary
   'COPD',
   'Asthma',
-  'ILD',
-  // Renal/Hepatic
   'CKD',
-  'Cirrhosis',
-  'Hep B',
-  'Hep C',
-  // Neurologic
   'Neuropathy',
+  'Autoimmune',
+  'Hypothyroid',
+  'Hep B/C',
+  'HIV',
+  'Prior cancer',
+  'Obesity',
+];
+
+const ADDITIONAL_COMORBIDITIES = [
+  'DVT/PE',
+  'PVD',
+  'Dyslipidemia',
+  'ILD',
+  'Cirrhosis',
   'Stroke/TIA',
   'Dementia',
-  // Endocrine
-  'Hypothyroid',
   'Hyperthyroid',
   'Adrenal insufficiency',
-  // Autoimmune/Inflammatory
   'Rheumatoid arthritis',
   'Lupus/SLE',
   'IBD',
   'Psoriasis',
-  'Other autoimmune',
-  // Infectious
-  'HIV',
   'TB history',
-  // Oncologic
-  'Prior malignancy',
   'Active 2nd cancer',
-  // Psychiatric
   'Depression',
   'Anxiety',
-  // Other
   'Transplant recipient',
   'Immunosuppressed',
 ];
 
 export function Comorbidities({ selected, onChange }: ComorbiditiesProps) {
   const [customInput, setCustomInput] = useState('');
+  const [showAdditional, setShowAdditional] = useState(false);
 
   const handleToggle = (comorbidity: string) => {
     if (selected.includes(comorbidity)) {
@@ -81,9 +73,20 @@ export function Comorbidities({ selected, onChange }: ComorbiditiesProps) {
     }
   };
 
-  // Get custom entries (ones not in the preset list)
-  const customEntries = selected.filter(
-    (s) => !COMMON_COMORBIDITIES.includes(s)
+  const handleSelectAdditional = (comorbidity: string) => {
+    if (!selected.includes(comorbidity)) {
+      onChange([...selected, comorbidity]);
+    }
+    setShowAdditional(false);
+  };
+
+  // Get custom entries (ones not in either preset list)
+  const allPresets = [...COMMON_COMORBIDITIES, ...ADDITIONAL_COMORBIDITIES];
+  const customEntries = selected.filter((s) => !allPresets.includes(s));
+
+  // Filter additional options to only show unselected ones
+  const availableAdditional = ADDITIONAL_COMORBIDITIES.filter(
+    (c) => !selected.includes(c)
   );
 
   return (
@@ -112,6 +115,23 @@ export function Comorbidities({ selected, onChange }: ComorbiditiesProps) {
         })}
       </div>
 
+      {/* Selected additional comorbidities as tags */}
+      {selected.filter((s) => ADDITIONAL_COMORBIDITIES.includes(s)).length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {selected
+            .filter((s) => ADDITIONAL_COMORBIDITIES.includes(s))
+            .map((comorbidity) => (
+              <button
+                key={comorbidity}
+                onClick={() => handleToggle(comorbidity)}
+                className="px-2 py-1 text-xs rounded-md border bg-emerald-100 border-emerald-300 text-emerald-700 transition-colors"
+              >
+                {comorbidity} ×
+              </button>
+            ))}
+        </div>
+      )}
+
       {/* Custom entries */}
       {customEntries.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-2">
@@ -127,8 +147,37 @@ export function Comorbidities({ selected, onChange }: ComorbiditiesProps) {
         </div>
       )}
 
-      {/* Add custom input */}
+      {/* Additional options dropdown and custom input */}
       <div className="flex gap-1">
+        <div className="relative">
+          <button
+            onClick={() => setShowAdditional(!showAdditional)}
+            className="px-2 py-1 text-xs border border-slate-200 rounded-md hover:border-slate-300 bg-white text-slate-600 flex items-center gap-1"
+          >
+            Additional
+            <ChevronDown className="w-3 h-3" />
+          </button>
+          {showAdditional && (
+            <div className="absolute z-10 mt-1 w-40 max-h-32 overflow-y-auto bg-white border border-slate-200 rounded-md shadow-lg">
+              {availableAdditional.length > 0 ? (
+                availableAdditional.map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => handleSelectAdditional(option)}
+                    className="w-full px-2 py-1.5 text-xs text-left hover:bg-emerald-50 transition-colors"
+                  >
+                    {option}
+                  </button>
+                ))
+              ) : (
+                <div className="px-2 py-1.5 text-xs text-slate-500">
+                  All selected
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         <input
           type="text"
           value={customInput}
