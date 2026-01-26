@@ -1,5 +1,19 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
+import { sql } from '@vercel/postgres';
 import OpenAI from 'openai';
+
+// Function to log Q&A to database
+async function logQA(sessionId: string, question: string, answer: string, followUps: string[]) {
+  try {
+    await sql`
+      INSERT INTO qa_logs (session_id, question, answer, follow_up_questions, created_at)
+      VALUES (${sessionId}, ${question}, ${answer}, ${JSON.stringify(followUps)}, NOW())
+    `;
+  } catch (error) {
+    // Log error but don't fail the request
+    console.error('Failed to log Q&A:', error);
+  }
+}
 
 const SYSTEM_PROMPT = `
 You are a CLINICAL SUPPORT ASSISTANT for urologists managing patients who may receive or have received Enfortumab Vedotin + Pembrolizumab (EVP) for urothelial carcinoma.
@@ -224,6 +238,9 @@ Rules:
           console.error('Failed to generate follow-up questions:', followUpError);
           // Continue without follow-up questions
         }
+        
+        // Log Q&A to database (non-blocking)
+        logQA(sessionId, message, mainResponse, followUpQuestions);
         
         return res.status(200).json({ 
           response: mainResponse,
