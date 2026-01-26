@@ -151,9 +151,9 @@ function App() {
         </div>
       </header>
 
-      <main className="flex-1">
-        <div className="w-full px-10 py-4">
-          <div className="flex gap-8 items-stretch">
+      <main className="flex-1 flex flex-col">
+        <div className="w-full px-10 py-4 flex-1 flex flex-col">
+          <div className="flex gap-8 items-stretch flex-1">
             {/* Toggle button for patient panel - only shown when ENABLE_PATIENT_PANEL is true */}
             {ENABLE_PATIENT_PANEL && !showPatientPanel && (
               <button
@@ -186,7 +186,7 @@ function App() {
             )}
 
             {/* Main chat area */}
-            <div className="flex-1 min-w-0 flex flex-col bg-white border border-slate-200 rounded-lg">
+            <div className="flex-1 min-w-0 flex flex-col bg-white border border-slate-200 rounded-lg min-h-[calc(100vh-140px)]">
               <div className="flex-1 overflow-y-auto p-4">
                 {messages.length === 0 && !error && (
                   <div className="text-center py-8">
