@@ -6,9 +6,9 @@ interface QuickQuestionsProps {
 }
 
 const QUICK_QUESTIONS = [
-  'What is the recommended dosing for Enfortumab Vedotin + Pembrolizumab?',
-  'What are the most common adverse events with EVP therapy?',
-  'What were the key efficacy outcomes from the EV-302 trial?',
+  'What is the recommended dosing schedule for Enfortumab Vedotin + Pembrolizumab combination therapy for bladder cancer?',
+  'What are the most common adverse events with EVP therapy for bladder cancer?',
+  'What were the key efficacy outcomes from the EV-302 trial for bladder cancer?',
 ];
 
 export function QuickQuestions({ onSelect, disabled }: QuickQuestionsProps) {

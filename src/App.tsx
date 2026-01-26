@@ -8,7 +8,10 @@ import { ApiKeyConfig } from './components/ApiKeyConfig';
 import { QuickQuestions } from './components/QuickQuestions';
 import { FollowUpQuestions } from './components/FollowUpQuestions';
 import { PatientInfoForm } from './components/PatientInfoForm';
-import { AlertCircle, Stethoscope } from 'lucide-react';
+import { AlertCircle, Stethoscope, User, ChevronRight } from 'lucide-react';
+
+// Set to true to enable the patient panel sidebar
+const ENABLE_PATIENT_PANEL = false;
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -19,6 +22,7 @@ function App() {
   );
   const [isConfigured, setIsConfigured] = useState(false);
   const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
+  const [showPatientPanel, setShowPatientPanel] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handleClearChat = () => {
@@ -119,8 +123,7 @@ function App() {
                   EVP Clinical Assistant
                 </h1>
                 <p className="text-sm text-slate-600">
-                  Urologist-facing support for Enfortumab Vedotin + Pembrolizumab
-                  therapy
+                  EVP therapy for urothelial cancer
                 </p>
               </div>
             </div>
@@ -151,15 +154,38 @@ function App() {
       <main className="flex-1">
         <div className="max-w-[1600px] mx-auto px-10 py-4 w-full">
           <div className="flex gap-8 items-stretch">
-            {/* Left sidebar - Patient Info */}
-            <div className="w-[420px] flex-shrink-0">
-              <PatientInfoForm
-                onGenerateQuestion={handleSendMessage}
-                disabled={isLoading || !openAIService}
-              />
-            </div>
+            {/* Toggle button for patient panel - only shown when ENABLE_PATIENT_PANEL is true */}
+            {ENABLE_PATIENT_PANEL && !showPatientPanel && (
+              <button
+                onClick={() => setShowPatientPanel(true)}
+                className="flex-shrink-0 w-10 h-10 rounded-lg bg-emerald-600 text-white flex items-center justify-center hover:bg-emerald-700 transition-colors shadow-md"
+                title="Show Patient Profile"
+              >
+                <User className="w-5 h-5" />
+              </button>
+            )}
 
-            {/* Main chat area - matches height of patient panel */}
+            {/* Left sidebar - Patient Info - only shown when ENABLE_PATIENT_PANEL is true */}
+            {ENABLE_PATIENT_PANEL && showPatientPanel && (
+              <div className="w-[420px] flex-shrink-0">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-600">Patient Profile</span>
+                  <button
+                    onClick={() => setShowPatientPanel(false)}
+                    className="text-slate-400 hover:text-slate-600 transition-colors"
+                    title="Hide Patient Profile"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+                <PatientInfoForm
+                  onGenerateQuestion={handleSendMessage}
+                  disabled={isLoading || !openAIService}
+                />
+              </div>
+            )}
+
+            {/* Main chat area */}
             <div className="flex-1 min-w-0 flex flex-col bg-white border border-slate-200 rounded-lg">
               <div className="flex-1 overflow-y-auto p-4">
                 {messages.length === 0 && !error && (
@@ -171,8 +197,7 @@ function App() {
                       Welcome to EVP Clinical Assistant
                     </h2>
                     <p className="text-slate-600 text-sm max-w-md mx-auto">
-                      Evidence-based clinical guidance for urologists managing
-                      EVP therapy. Ask about dosing, efficacy, safety, or trial data.
+                      Evidence-based clinical guidance for Enfortumab Vedotin + Pembrolizumab (EVP) therapy for urothelial cancer. Ask about dosing, efficacy, safety, or trial data.
                     </p>
                     <QuickQuestions
                       onSelect={handleSendMessage}
