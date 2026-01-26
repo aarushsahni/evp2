@@ -13,11 +13,11 @@ export function FollowUpQuestions({ questions, onSelect, disabled }: FollowUpQue
 
   return (
     <div className="mt-4 mb-2">
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-2 mb-3 justify-center">
         <Lightbulb className="w-4 h-4 text-amber-500" />
         <span className="text-xs font-medium text-slate-500">Suggested Follow-ups</span>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 justify-center">
         {questions.map((question, index) => (
           <button
             key={index}
