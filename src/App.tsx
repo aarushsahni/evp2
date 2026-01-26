@@ -152,7 +152,7 @@ function App() {
       </header>
 
       <main className="flex-1">
-        <div className="max-w-[1600px] mx-auto px-10 py-4 w-full">
+        <div className="w-full px-10 py-4">
           <div className="flex gap-8 items-stretch">
             {/* Toggle button for patient panel - only shown when ENABLE_PATIENT_PANEL is true */}
             {ENABLE_PATIENT_PANEL && !showPatientPanel && (
