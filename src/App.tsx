@@ -153,6 +153,20 @@ function App() {
 
       <main className="flex-1">
         <div className="max-w-5xl mx-auto px-10 py-4">
+          {/* Video embed section */}
+          <div className="mb-6">
+            <div className="aspect-video w-full max-w-4xl mx-auto rounded-lg overflow-hidden shadow-lg border border-slate-200">
+              <iframe
+                className="w-full h-full"
+                src="https://www.youtube.com/embed/Zs83tPA3pD0"
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+          </div>
+
           <div className="flex gap-8 items-stretch">
             {/* Toggle button for patient panel - only shown when ENABLE_PATIENT_PANEL is true */}
             {ENABLE_PATIENT_PANEL && !showPatientPanel && (
