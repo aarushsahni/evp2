@@ -1,10 +1,28 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { sql } from '@vercel/postgres';
 
+// Set this in your Vercel environment variables (Settings > Environment Variables)
+// Add a variable called QA_LOGS_SECRET with a strong random string
+function isAuthorized(req: VercelRequest): boolean {
+  const secret = process.env.QA_LOGS_SECRET;
+  if (!secret) return false;
+
+  // Check for secret in query param or Authorization header
+  const querySecret = req.query.secret as string;
+  const headerSecret = req.headers.authorization?.replace('Bearer ', '');
+
+  return querySecret === secret || headerSecret === secret;
+}
+
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
+  // All requests to this endpoint require authentication
+  if (!isAuthorized(req)) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   // Initialize table on first request or GET with ?init=true
   if (req.method === 'GET' && req.query.init === 'true') {
     try {
@@ -25,21 +43,19 @@ export default async function handler(
     }
   }
 
-  // GET - Retrieve all Q&A logs
+  // GET - Retrieve all Q&A logs (no limit)
   if (req.method === 'GET') {
     try {
       const { rows } = await sql`
         SELECT * FROM qa_logs 
-        ORDER BY created_at DESC 
-        LIMIT 100
+        ORDER BY created_at DESC
       `;
       return res.status(200).json({ logs: rows });
     } catch (error) {
       console.error('Failed to fetch logs:', error);
-      // If table doesn't exist, return empty with instructions
       return res.status(200).json({ 
         logs: [], 
-        message: 'No logs yet. Initialize the table by visiting /api/qa-logs?init=true' 
+        message: 'No logs yet. Initialize the table by visiting /api/qa-logs?init=true&secret=YOUR_SECRET' 
       });
     }
   }
