@@ -183,45 +183,52 @@ export default async function handler(
         if (item.type === 'text' && item.text?.value) {
           let value = item.text.value.trim();
           
-          // Process annotations to replace citation markers with actual source names
+          // Process annotations: replace citation markers with source file names
           if (item.text.annotations && item.text.annotations.length > 0) {
-            // Build a map of file IDs to file names
             const fileNameCache: { [key: string]: string } = {};
             
-            // Sort annotations by start_index descending to replace from end to start
-            // This prevents index shifting issues when replacing
+            // Sort by start_index descending so replacements don't shift positions
             const sortedAnnotations = [...item.text.annotations].sort(
-              (a, b) => (b.start_index || 0) - (a.start_index || 0)
+              (a, b) => (b.start_index ?? 0) - (a.start_index ?? 0)
             );
             
             for (const annotation of sortedAnnotations) {
+              if (!annotation.text) continue;
+
+              let replacement = '';
+
               if (annotation.type === 'file_citation' && annotation.file_citation) {
                 const fileId = annotation.file_citation.file_id;
                 let fileName = fileNameCache[fileId];
                 
-                // Fetch file name if not cached
                 if (!fileName && fileId) {
                   try {
                     const file = await client.files.retrieve(fileId);
-                    fileName = file.filename || 'Unknown Source';
-                    // Remove file extension for cleaner display
+                    fileName = file.filename || 'Source';
                     fileName = fileName.replace(/\.[^/.]+$/, '');
                     fileNameCache[fileId] = fileName;
                   } catch {
                     fileName = 'Source';
                   }
                 }
-                
-                // Replace the citation marker with the actual source name
-                if (annotation.text && fileName) {
-                  value = value.replace(
-                    annotation.text,
-                    `【${fileName}】`
-                  );
-                }
+                replacement = `【${fileName}】`;
+              }
+              // For any other annotation type, just remove the marker
+
+              // Use start/end index for precise replacement to avoid partial matches
+              const start = annotation.start_index;
+              const end = annotation.end_index;
+              if (start != null && end != null) {
+                value = value.slice(0, start) + replacement + value.slice(end);
+              } else {
+                // Fallback: replace the annotation text literally
+                value = value.split(annotation.text).join(replacement);
               }
             }
           }
+
+          // Clean up: remove stray spaces before punctuation left by removed markers
+          value = value.replace(/ +([.,;:!?])/g, '$1');
           
           if (value) {
             parts.push(value);
