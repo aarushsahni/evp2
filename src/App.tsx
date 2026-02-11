@@ -59,9 +59,6 @@ function App() {
     }
   }, []);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isLoading]);
 
   const handleAssistantConfigured = (assistantId: string) => {
     localStorage.setItem('openai_assistant_id', assistantId);
