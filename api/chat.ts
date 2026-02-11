@@ -239,8 +239,8 @@ Rules:
           // Continue without follow-up questions
         }
         
-        // Log Q&A to database (non-blocking)
-        logQA(sessionId, message, mainResponse, followUpQuestions);
+        // Log Q&A to database (must await before responding, otherwise Vercel may kill the function)
+        await logQA(sessionId, message, mainResponse, followUpQuestions);
         
         return res.status(200).json({ 
           response: mainResponse,
