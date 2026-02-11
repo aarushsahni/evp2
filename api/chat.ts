@@ -2,16 +2,33 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import { sql } from '@vercel/postgres';
 import OpenAI from 'openai';
 
-// Function to log Q&A to database
-async function logQA(sessionId: string, question: string, answer: string, followUps: string[]) {
+// Log or append to conversation in database (full conversation as JSON)
+async function logConversation(
+  conversationId: string,
+  sessionId: string,
+  question: string,
+  answer: string,
+  followUps: string[]
+) {
+  const newMessage = {
+    question,
+    answer,
+    follow_up_questions: followUps,
+    created_at: new Date().toISOString(),
+  };
+  const messagesArray = JSON.stringify([newMessage]);
+
   try {
     await sql`
-      INSERT INTO qa_logs (session_id, question, answer, follow_up_questions, created_at)
-      VALUES (${sessionId}, ${question}, ${answer}, ${JSON.stringify(followUps)}, NOW())
+      INSERT INTO conversations (conversation_id, session_id, messages)
+      VALUES (${conversationId}, ${sessionId}, ${messagesArray}::jsonb)
+      ON CONFLICT (conversation_id) DO UPDATE SET
+        messages = conversations.messages || EXCLUDED.messages,
+        updated_at = NOW()
     `;
   } catch (error) {
-    // Log error but don't fail the request
-    console.error('Failed to log Q&A:', error);
+    console.error('Failed to log conversation:', error);
+    throw error;
   }
 }
 
@@ -82,13 +99,16 @@ export default async function handler(
   }
 
   try {
-    const { message, sessionId, assistantId } = req.body;
+    const { message, sessionId, assistantId, conversationId } = req.body;
 
     if (!message || !sessionId || !assistantId) {
       return res
         .status(400)
         .json({ error: 'Missing required fields' });
     }
+
+    // Generate conversationId if not provided (backward compat)
+    const convId = conversationId || `conv_${Date.now()}_${Math.random().toString(36).slice(2)}`;
 
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
@@ -239,8 +259,8 @@ Rules:
           // Continue without follow-up questions
         }
         
-        // Log Q&A to database (must await before responding, otherwise Vercel may kill the function)
-        await logQA(sessionId, message, mainResponse, followUpQuestions);
+        // Log conversation to database (appends to existing or creates new)
+        await logConversation(convId, sessionId, message, mainResponse, followUpQuestions);
         
         return res.status(200).json({ 
           response: mainResponse,

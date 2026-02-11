@@ -59,16 +59,19 @@ const threadStates: ThreadState = {};
 export class OpenAIService {
   private assistantId: string;
   private sessionId: string;
+  private conversationId: string;
 
   constructor(assistantId: string) {
     if (!assistantId) throw new Error("Missing Assistant ID");
 
     this.assistantId = assistantId;
     this.sessionId = `session_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    this.conversationId = `conv_${Date.now()}_${Math.random().toString(36).slice(2)}`;
   }
 
   resetConversation() {
     delete threadStates[this.sessionId];
+    this.conversationId = `conv_${Date.now()}_${Math.random().toString(36).slice(2)}`;
   }
 
   async askQuestion(question: string): Promise<{ response: string; followUpQuestions: string[] }> {
@@ -82,6 +85,7 @@ export class OpenAIService {
           message: question,
           sessionId: this.sessionId,
           assistantId: this.assistantId,
+          conversationId: this.conversationId,
         }),
       });
 

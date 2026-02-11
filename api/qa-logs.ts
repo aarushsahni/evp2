@@ -27,13 +27,13 @@ export default async function handler(
   if (req.method === 'GET' && req.query.init === 'true') {
     try {
       await sql`
-        CREATE TABLE IF NOT EXISTS qa_logs (
+        CREATE TABLE IF NOT EXISTS conversations (
           id SERIAL PRIMARY KEY,
+          conversation_id VARCHAR(255) UNIQUE NOT NULL,
           session_id VARCHAR(255) NOT NULL,
-          question TEXT NOT NULL,
-          answer TEXT NOT NULL,
-          follow_up_questions TEXT,
-          created_at TIMESTAMP DEFAULT NOW()
+          messages JSONB NOT NULL DEFAULT '[]',
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
         )
       `;
       return res.status(200).json({ message: 'Table initialized successfully' });
@@ -43,31 +43,32 @@ export default async function handler(
     }
   }
 
-  // GET - Retrieve all Q&A logs (no limit)
+  // GET - Retrieve all conversations (full Q&A as JSON)
   if (req.method === 'GET') {
     try {
       const { rows } = await sql`
-        SELECT * FROM qa_logs 
-        ORDER BY created_at DESC
+        SELECT id, conversation_id, session_id, messages, created_at, updated_at
+        FROM conversations 
+        ORDER BY updated_at DESC
       `;
-      return res.status(200).json({ logs: rows });
+      return res.status(200).json({ conversations: rows });
     } catch (error) {
-      console.error('Failed to fetch logs:', error);
+      console.error('Failed to fetch conversations:', error);
       return res.status(200).json({ 
-        logs: [], 
-        message: 'No logs yet. Initialize the table by visiting /api/qa-logs?init=true&secret=YOUR_SECRET' 
+        conversations: [], 
+        message: 'No data yet. Initialize by visiting /api/qa-logs?init=true&secret=YOUR_SECRET' 
       });
     }
   }
 
-  // DELETE - Clear all logs (optional, for cleanup)
+  // DELETE - Clear all conversations
   if (req.method === 'DELETE') {
     try {
-      await sql`DELETE FROM qa_logs`;
-      return res.status(200).json({ message: 'All logs cleared' });
+      await sql`DELETE FROM conversations`;
+      return res.status(200).json({ message: 'All conversations cleared' });
     } catch (error) {
-      console.error('Failed to clear logs:', error);
-      return res.status(500).json({ error: 'Failed to clear logs' });
+      console.error('Failed to clear conversations:', error);
+      return res.status(500).json({ error: 'Failed to clear conversations' });
     }
   }
 
