@@ -8,7 +8,7 @@ interface QuickQuestionsProps {
 const QUICK_QUESTIONS = [
   'What is the recommended dosing schedule for Enfortumab Vedotin + Pembrolizumab combination therapy for urothelial cancer?',
   'What are the most common adverse events with EVP therapy for urothelial cancer?',
-  'What were the key efficacy outcomes from the EV-302 trial for urothelial cancer?',
+  'What were the key efficacy outcomes from the EV-303 trial for urothelial cancer?',
 ];
 
 export function QuickQuestions({ onSelect, disabled }: QuickQuestionsProps) {
