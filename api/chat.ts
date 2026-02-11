@@ -270,10 +270,16 @@ Rules:
     }
 
     throw new Error('Unexpected response format — no text message found');
-  } catch (error) {
+  } catch (error: any) {
     console.error('API Error:', error);
     const errorMessage =
       error instanceof Error ? error.message : 'An unexpected error occurred';
-    return res.status(500).json({ error: errorMessage });
+    const errorDetails = {
+      error: errorMessage,
+      type: error?.constructor?.name || typeof error,
+      code: error?.code || undefined,
+      stack: error?.stack?.split('\n').slice(0, 3).join(' | ') || undefined,
+    };
+    return res.status(500).json(errorDetails);
   }
 }
