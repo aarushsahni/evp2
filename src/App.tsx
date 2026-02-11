@@ -8,7 +8,7 @@ import { ApiKeyConfig } from './components/ApiKeyConfig';
 import { QuickQuestions } from './components/QuickQuestions';
 import { FollowUpQuestions } from './components/FollowUpQuestions';
 import { PatientInfoForm } from './components/PatientInfoForm';
-import { AlertCircle, Stethoscope, User, ChevronRight } from 'lucide-react';
+import { AlertCircle, Stethoscope, User, ChevronRight, ShieldAlert, PlayCircle, MessageSquare, ClipboardCheck } from 'lucide-react';
 
 // Set to true to enable the patient panel sidebar
 const ENABLE_PATIENT_PANEL = false;
@@ -153,6 +153,31 @@ function App() {
 
       <main className="flex-1">
         <div className="max-w-5xl mx-auto px-10 py-4">
+          {/* Workflow steps */}
+          <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-lg px-4 py-3 shadow-sm">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-bold">1</div>
+              <div className="flex items-center gap-2">
+                <PlayCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <span className="text-sm font-medium text-slate-700">Watch the video below</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-lg px-4 py-3 shadow-sm">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-bold">2</div>
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <span className="text-sm font-medium text-slate-700">Ask any questions in the chatbot</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-lg px-4 py-3 shadow-sm">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-bold">3</div>
+              <div className="flex items-center gap-2">
+                <ClipboardCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <span className="text-sm font-medium text-slate-700">Complete the survey sent by email</span>
+              </div>
+            </div>
+          </div>
+
           {/* Video embed section */}
           <div className="mb-6">
             <div className="aspect-video w-full max-w-4xl mx-auto rounded-lg overflow-hidden shadow-lg border border-slate-200">
@@ -164,6 +189,22 @@ function App() {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
               />
+            </div>
+          </div>
+
+          {/* Disclaimer */}
+          <div className="mb-6 max-w-4xl mx-auto">
+            <div className="bg-amber-50 border border-amber-300 rounded-lg px-5 py-4 flex gap-3">
+              <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-amber-900 space-y-2">
+                <p className="font-semibold">Important Notice</p>
+                <p>
+                  <strong>Do not input any patient-specific information.</strong> This tool is <strong>not HIPAA-protected</strong> and is meant only as an <strong>educational resource</strong> to answer general questions about EVP therapy.
+                </p>
+                <p>
+                  Chatbot transcripts will be analyzed at the end of the study to evaluate accuracy and completeness. All logs will be <strong>de-identified</strong> and will not be linked to you as an individual user.
+                </p>
+              </div>
             </div>
           </div>
 
