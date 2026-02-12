@@ -6,9 +6,9 @@ interface QuickQuestionsProps {
 }
 
 const QUICK_QUESTIONS = [
-  'What is the recommended dosing schedule for Enfortumab Vedotin + Pembrolizumab combination therapy for urothelial cancer?',
-  'What are the most common adverse events with EVP therapy for urothelial cancer?',
-  'What were the key efficacy outcomes from the EV-303 trial for urothelial cancer?',
+  'How do I summarize the key efficacy takeaways from EV-303 (perioperative EV+P in cisplatin-ineligible patients) in a way that\'s useful for shared decision-making?',
+  'What are the top toxicities from EV+P I need to counsel on up front—and what are the red-flag symptoms that require urgent action?',
+  'Based on the EV-303 and EV-304 trials that tested perioperative EV+P, how can I explain to patients the timing of EV+P and cystectomy?',
 ];
 
 export function QuickQuestions({ onSelect, disabled }: QuickQuestionsProps) {
