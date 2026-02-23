@@ -156,7 +156,7 @@ function App() {
             <div className="aspect-video w-full rounded-xl overflow-hidden shadow-lg border border-slate-200">
               <iframe
                 className="w-full h-full"
-                src="https://www.youtube.com/embed/Zs83tPA3pD0"
+                src="https://www.youtube.com/embed/XIM6YcYXkRM"
                 title="YouTube video player"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
